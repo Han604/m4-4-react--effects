@@ -156,8 +156,10 @@ Update the following snippets to make use of `useEffect`
 ```js
 const App = () => {
   const [count, setCount] = React.useState(0);
-
-  document.title = `You have clicked ${count} times`;
+  react.useEffect(() => {
+    document.title = `You have clicked ${count} times`;
+  }, [count]);
+  
 
   return (
     <button onClick={() => setCount(count + 1)}>
@@ -173,8 +175,12 @@ const App = () => {
 const App = ({ color }) => {
   const [value, setValue] = React.useState(false);
 
+  React.useEffect(() => {
   window.localStorage.setItem('value', value);
+  },[value]);
+  React.useEffect(() => {
   window.localStorage.setItem('color', color);
+  },[color]);
 
   return (
     <div>
@@ -191,11 +197,12 @@ const App = ({ color }) => {
 
 ```js
 const Modal = ({ handleClose }) => {
-  window.addEventListener('keydown', (ev) => {
-    if (ev.code === 'Escape') {
-      handleClose();
-    }
-  });
+  React.useEffect(() => {
+    window.addEventListener('keydown', (ev) => {
+      if (ev.code === 'Escape') {
+        handleClose();
+      }
+    }); []);
 
   return (
     <div>
@@ -314,12 +321,15 @@ Make sure to do the appropriate cleanup work
 ```js
 // seTimeout is similar to setInterval...
 const App = () => {
+  const timerTofu = window.setTimout(() => {
+    console.log('1 second after update!')
+  }, time)
   React.useEffect(() => {
-    window.setTimeout(() => {
-      console.log('1 second after update!')
-    });
+    timerTofu(1000);
+  return () => {
+    clearTimeout(timerTofu);
+    }
   }, [])
-
   return null;
 }
 ```
@@ -328,12 +338,18 @@ const App = () => {
 
 ```js
 const App = () => {
-  React.useEffect(() => {
-    window.addEventListener('keydown', (ev) => {
-      console.log('You pressed: ' + ev.code);
-    })
-  }, [])
+  const handlePress = (ev) => {
+    console.log('You pressed: ' + ev.code);
+  }
 
+  React.useEffect(() => {
+      window.addEventListener('keydown', handlePress);
+
+      return () => {
+        window.removeEventListener('keydown', handlePress);
+      }
+  }
+}, [])
   return null;
 }
 ```
@@ -417,7 +433,7 @@ Extract a custom hook
 ---
 
 ```js
-const App = ({ path }) => {
+const useData = () = {
   const [data, setData] = React.useState(null);
 
   React.useEffect(() => {
@@ -427,13 +443,20 @@ const App = ({ path }) => {
         setData(json);
       })
   }, [path])
+  return data;
+}
 
+
+const App = ({ path }) => {
+  const data = useData(path);
+  
   return (
     <span>
       Data: {JSON.stringify(data)}
     </span>
   );
 }
+
 ```
 
 ---

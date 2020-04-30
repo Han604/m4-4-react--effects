@@ -98,15 +98,13 @@ Use `useRef`
 
 ```js
 const ConfirmButton = () => {
-  React.useEffect(() => {
-    const btn = document.getElementById('confirm-button');
-
+  const btn = React.useRef(null);
     if (btn) {
-      btn.focus();
+      btn.current.focus();
     }
   }, []);
 
-  return <button id="confirm-button">Confirm</button>;
+  return <button ref={btn} id="confirm-button">Confirm</button>;
 };
 ```
 
